@@ -69,28 +69,28 @@ public class TollFeeCalculatorTests {
 
     @Test
     void isTollFreeDate() {
-        var dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        var dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        boolean result1 = calculator.isTollFreeDate(LocalDateTime.parse("2020-06-30 00:05", dateTimeFormatter));
-        boolean result2 = calculator.isTollFreeDate(LocalDateTime.parse("2020-06-30 06:34", dateTimeFormatter));
-        boolean result3 = calculator.isTollFreeDate(LocalDateTime.parse("2020-06-30 08:52", dateTimeFormatter));
-        boolean result4 = calculator.isTollFreeDate(LocalDateTime.parse("2020-06-30 10:13", dateTimeFormatter));
-        boolean result5 = calculator.isTollFreeDate(LocalDateTime.parse("2020-06-30 10:25", dateTimeFormatter));
-        boolean result6 = calculator.isTollFreeDate(LocalDateTime.parse("2020-06-30 11:04", dateTimeFormatter));
-        boolean result7 = calculator.isTollFreeDate(LocalDateTime.parse("2020-06-30 16:50", dateTimeFormatter));
-        boolean result8 = calculator.isTollFreeDate(LocalDateTime.parse("2020-06-30 18:00", dateTimeFormatter));
-        boolean result9 = calculator.isTollFreeDate(LocalDateTime.parse("2020-06-30 21:30", dateTimeFormatter));
-        boolean result10 = calculator.isTollFreeDate(LocalDateTime.parse("2020-07-01 00:00", dateTimeFormatter));
+        boolean result1 = calculator.isTollFreeDate(LocalDateTime.parse("2020-06-30", dateTimeFormatter));
+        boolean result2 = calculator.isTollFreeDate(LocalDateTime.parse("2020-06-30", dateTimeFormatter));
+        boolean result3 = calculator.isTollFreeDate(LocalDateTime.parse("2020-06-30", dateTimeFormatter));
+        boolean result4 = calculator.isTollFreeDate(LocalDateTime.parse("2020-06-30", dateTimeFormatter));
+        boolean result5 = calculator.isTollFreeDate(LocalDateTime.parse("2020-06-30", dateTimeFormatter));
+        boolean result6 = calculator.isTollFreeDate(LocalDateTime.parse("2020-06-30", dateTimeFormatter));
+        boolean result7 = calculator.isTollFreeDate(LocalDateTime.parse("2020-06-30", dateTimeFormatter));
+        boolean result8 = calculator.isTollFreeDate(LocalDateTime.parse("2020-06-30", dateTimeFormatter));
+        boolean result9 = calculator.isTollFreeDate(LocalDateTime.parse("2020-06-30", dateTimeFormatter));
+        boolean result10 = calculator.isTollFreeDate(LocalDateTime.parse("2020-07-01", dateTimeFormatter));
 
         assertFalse(result1);
-        assertTrue(result2);
-        assertTrue(result3);
-        assertTrue(result4);
-        assertTrue(result5);
-        assertTrue(result6);
-        assertTrue(result7);
-        assertTrue(result8);
+        assertFalse(result2);
+        assertFalse(result3);
+        assertFalse(result4);
+        assertFalse(result5);
+        assertFalse(result6);
+        assertFalse(result7);
+        assertFalse(result8);
         assertFalse(result9);
-        assertFalse(result10);
+        assertTrue(result10);
     }
 }
