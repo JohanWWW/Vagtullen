@@ -1,7 +1,7 @@
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -14,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TollFeeCalculatorTests {
 
     @Test
+    @DisplayName("Validate that toll fees are calculated correctly")
     void getTotalFeeCost() {
         // Arrange & Act
         int result = TollFeeCalculator.getTotalFeeCost(new LocalDateTime[] {
@@ -31,6 +32,71 @@ public class TollFeeCalculatorTests {
 
         // Assert
         assertEquals(55, result);
+    }
+
+    @Test
+    @DisplayName("Validate that getTotalFeeCost prints localDateTime in chronological order to the console")
+    void getTotalFeeCostPrintsCorrectDateOrder() {
+        // Arrange
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        PrintStream printStream = new PrintStream(outputStream);
+        System.setOut(printStream);
+
+        LocalDateTime[] unorderedDates = {
+            createDateTime("2020-10-05 18:00"),
+            createDateTime("2020-10-05 15:30"),
+            createDateTime("2020-10-05 17:00"),
+            createDateTime("2020-10-05 06:30")
+        };
+
+        // Act
+        TollFeeCalculator.getTotalFeeCost(unorderedDates);
+
+        String actualConsoleOutput = outputStream.toString()
+                                                 .replace("\r\n", "\n") // Windows
+                                                 .replace("\r", "\n"); // MacOS
+
+        printStream.close();
+
+        // Assert
+        String expectedConsoleOutput =
+            "2020-10-05T06:30\n" +
+            "2020-10-05T15:30\n" +
+            "2020-10-05T17:00\n" +
+            "2020-10-05T18:00\n";
+
+        assertEquals(expectedConsoleOutput, actualConsoleOutput);
+    }
+
+    @Test
+    @DisplayName("Validate that toll fees are calculated for each day")
+    void getTotalFeeCostForOverlappingDays() {
+        // Arrange
+        LocalDateTime[] testDates = {
+            // First day
+            createDateTime("2020-10-05 06:30"),
+            createDateTime("2020-10-05 07:59"),
+            createDateTime("2020-10-05 15:00"),
+            createDateTime("2020-10-05 15:30"),
+            createDateTime("2020-10-05 16:30"),
+            createDateTime("2020-10-05 17:00"),
+            createDateTime("2020-10-05 18:00"),
+
+            // Second day
+            createDateTime("2020-10-06 06:30"),
+            createDateTime("2020-10-06 07:59"),
+            createDateTime("2020-10-06 15:00"),
+            createDateTime("2020-10-06 15:30"),
+            createDateTime("2020-10-06 16:30"),
+            createDateTime("2020-10-06 17:00"),
+            createDateTime("2020-10-06 18:00")
+        };
+
+        // Act
+        int result = TollFeeCalculator.getTotalFeeCost(testDates);
+
+        // Assert
+        assertEquals(120, result); // 60 + 60 = 120
     }
 
     @Test
@@ -61,6 +127,7 @@ public class TollFeeCalculatorTests {
     }
 
     @Test
+    @DisplayName("Validate isTollFreeDate returns correct values")
     void isTollFreeDate() {
         /*
             Toll free dates are:
