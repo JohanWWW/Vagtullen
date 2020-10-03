@@ -1,9 +1,13 @@
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Scanner;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -58,29 +62,62 @@ public class TollFeeCalculatorTests {
 
     @Test
     void isTollFreeDate() {
-        // Arrange & Act
-        boolean result1 = TollFeeCalculator.isTollFreeDate(createDate("2020-06-30"));
-        boolean result2 = TollFeeCalculator.isTollFreeDate(createDate("2020-06-30"));
-        boolean result3 = TollFeeCalculator.isTollFreeDate(createDate("2020-06-30"));
-        boolean result4 = TollFeeCalculator.isTollFreeDate(createDate("2020-06-30"));
-        boolean result5 = TollFeeCalculator.isTollFreeDate(createDate("2020-06-30"));
-        boolean result6 = TollFeeCalculator.isTollFreeDate(createDate("2020-06-30"));
-        boolean result7 = TollFeeCalculator.isTollFreeDate(createDate("2020-06-30"));
-        boolean result8 = TollFeeCalculator.isTollFreeDate(createDate("2020-06-30"));
-        boolean result9 = TollFeeCalculator.isTollFreeDate(createDate("2020-06-30"));
-        boolean result10 = TollFeeCalculator.isTollFreeDate(createDate("2020-07-01"));
+        /*
+            Toll free dates are:
+                * Saturday
+                * Sunday
+                * Any day in the month of July
+         */
+
+        // Arrange
+        LocalDateTime tuesdayInJune = createDate("2020-06-16");
+        LocalDateTime saturdayInJune = createDate("2020-06-27");
+        LocalDateTime sundayInJuly = createDate("2020-07-19");
+        LocalDateTime thursdayInJuly = createDate("2020-07-30");
+        LocalDateTime fridayInAugust = createDate("2020-08-07");
+
+        // Act
+        boolean result1 = TollFeeCalculator.isTollFreeDate(tuesdayInJune);
+        boolean result2 = TollFeeCalculator.isTollFreeDate(saturdayInJune);
+        boolean result3 = TollFeeCalculator.isTollFreeDate(sundayInJuly);
+        boolean result4 = TollFeeCalculator.isTollFreeDate(thursdayInJuly);
+        boolean result5 = TollFeeCalculator.isTollFreeDate(fridayInAugust);
 
         // Assert
         assertFalse(result1);
-        assertFalse(result2);
-        assertFalse(result3);
-        assertFalse(result4);
+        assertTrue(result2);
+        assertTrue(result3);
+        assertTrue(result4);
         assertFalse(result5);
-        assertFalse(result6);
-        assertFalse(result7);
-        assertFalse(result8);
-        assertFalse(result9);
-        assertTrue(result10); // The month of July is toll free
+    }
+
+    private static LocalDateTime[] deserializeFile(String filePath) throws FileNotFoundException {
+        var file = new File(filePath);
+
+        LocalDateTime[] localDateTimeArray;
+
+        Scanner scanner = null;
+        try {
+            scanner = new Scanner(file);
+            var localDateTimeList = new ArrayList<LocalDateTime>();
+
+            while (scanner.hasNextLine()) {
+                LocalDateTime localDateTime = createDateTime(scanner.nextLine());
+                localDateTimeList.add(localDateTime);
+            }
+
+            localDateTimeArray = new LocalDateTime[localDateTimeList.size()];
+            localDateTimeList.toArray(localDateTimeArray);
+
+            return localDateTimeArray;
+
+        } catch (FileNotFoundException e) {
+            throw e;
+        } finally {
+            // Creating an instance of Scanner can fail and remain null
+            if (scanner != null)
+                scanner.close();
+        }
     }
 
     private static LocalDateTime createDateTime(CharSequence dateTimeString) {
