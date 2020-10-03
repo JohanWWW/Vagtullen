@@ -58,6 +58,6 @@ public class TollFeeCalculator {
     }
 
     public static void main(String[] args) {
-        new TollFeeCalculator("testData/Lab4.txt");
+        new TollFeeCalculator("Lab4.txt");
     }
 }
