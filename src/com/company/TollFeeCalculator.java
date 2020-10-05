@@ -10,8 +10,9 @@ import java.util.Scanner;
 public class TollFeeCalculator {
 
     public TollFeeCalculator(String inputFile) {
+        Scanner sc = null;
         try {
-            Scanner sc = new Scanner(new File(inputFile));
+            sc = new Scanner(new File(inputFile));
             String[] dateStrings = sc.nextLine().split(", ");
             LocalDateTime[] dates = new LocalDateTime[dateStrings.length-1];
             for(int i = 0; i < dates.length; i++) {
@@ -20,6 +21,10 @@ public class TollFeeCalculator {
             System.out.println("The total fee for the inputfile is" + getTotalFeeCost(dates));
         } catch(IOException e) {
             System.err.println("Could not read file " + inputFile);
+        } catch (IllegalStateException e) {
+
+        } finally {
+            sc.close();
         }
     }
 
