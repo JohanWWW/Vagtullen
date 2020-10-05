@@ -15,4 +15,5 @@ Mohammed Irheem & Johan Wassberg
 - The constructor does not catch ``NoSuchElementException`` which is thrown if the input file is empty **(Line 13)**
 - The constructor does not catch ``DateTimeParseException`` which is thrown if a date time string from the input file is not "yyyy-MM-dd HH:mm"-formatted **(Line 16)**
 - The constructor does not catch ``NullPointerException`` which is thrown if constructor parameter ``inputFile`` is null.
-- The file stream is never closed which can lead to ``InvalidStateException`` **(Line 14)**
+- ~~The file stream is never closed which can lead to ``InvalidStateException`` **(Line 14)**~~ *(difficult to unit test)*
+- If the file contains only one date time, ``getTotalFeeCost`` throws an ``ArrayIndexOutOfBoundsException`` at **Line 28**. This is caused by an off-by-one error at **Line 14** which leads to a zero sized array being created.
