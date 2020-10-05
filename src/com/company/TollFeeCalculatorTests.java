@@ -9,11 +9,56 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.Scanner;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TollFeeCalculatorTests {
+
+    @Test
+    @DisplayName("Validate that getTotalFeeCost prints correct output to the console")
+    void tollFeeCalculatorPrintsCorrectOutput() {
+        // Arrange
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        PrintStream printStream = new PrintStream(outputStream);
+        System.setOut(printStream);
+
+        // Act
+        new TollFeeCalculator("test_dates.txt"); // Discard result because we are only interested of what is printed to the console
+
+        String actualConsoleOutput = outputStream.toString()
+                                                 .replace("\r\n", "\n") // Windows
+                                                 .replace("\r", "\n"); // MacOS
+
+        printStream.close();
+
+        // Assert
+        String expectedConsoleOutput =
+            "2020-06-06T18:19\n" +
+            "2020-06-07T16:42\n" +
+            "2020-06-11T16:11\n" +
+            "2020-06-14T07:46\n" +
+            "2020-06-15T14:47\n" +
+            "2020-06-18T19:18\n" +
+            "2020-06-18T19:34\n" +
+            "2020-06-18T23:41\n" +
+            "2020-06-20T12:25\n" +
+            "2020-06-20T14:23\n" +
+            "2020-06-22T19:23\n" +
+            "2020-06-27T04:42\n" +
+            "2020-06-28T02:57\n" +
+            "2020-06-28T17:25\n" +
+            "2020-06-28T19:44\n" +
+            "2020-06-29T16:08\n" +
+            "2020-07-01T13:47\n" +
+            "2020-07-12T04:11\n" +
+            "2020-07-14T02:14\n" +
+            "2020-07-14T03:05\n" +
+            "The total fee for the inputfile is44\n"; // <- Missing whitespace :(
+
+        assertEquals(expectedConsoleOutput, actualConsoleOutput);
+    }
 
     @Test
     @DisplayName("Validate that toll fees are calculated correctly")
@@ -39,6 +84,11 @@ public class TollFeeCalculatorTests {
     @Test
     @DisplayName("Validate that getTotalFeeCost prints localDateTime in chronological order to the console")
     void getTotalFeeCostPrintsCorrectDateOrder() {
+        /*
+            We need to listen to the output stream because there is no way to
+            test a variable inside the method that is being tested
+        */
+
         // Arrange
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         PrintStream printStream = new PrintStream(outputStream);
@@ -158,6 +208,26 @@ public class TollFeeCalculatorTests {
         assertTrue(result3);
         assertTrue(result4);
         assertFalse(result5);
+    }
+
+    @Test
+    void tollFeeCalculatorCatchesNoSuchElementException() {
+
+    }
+
+    @Test
+    void tollFeeCalculatorCatchesDateTimeParseException() {
+
+    }
+
+    @Test
+    void tollFeeCalculatorCatchesNullPointerException() {
+        // Assert & Act & Assert
+        try {
+            new TollFeeCalculator(null);
+        } catch (NullPointerException e) {
+            fail();
+        }
     }
 
     private static LocalDateTime[] deserializeFile(String filePath) throws FileNotFoundException {
