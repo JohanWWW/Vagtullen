@@ -9,9 +9,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
 import java.util.NoSuchElementException;
-import java.util.Scanner;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -319,35 +317,6 @@ public class TollFeeCalculatorTests {
         }
 
         // Assert
-    }
-
-    private static LocalDateTime[] deserializeFile(String filePath) throws FileNotFoundException {
-        var file = new File(filePath);
-
-        LocalDateTime[] localDateTimeArray;
-
-        Scanner scanner = null;
-        try {
-            scanner = new Scanner(file);
-            var localDateTimeList = new ArrayList<LocalDateTime>();
-
-            while (scanner.hasNextLine()) {
-                LocalDateTime localDateTime = createDateTime(scanner.nextLine());
-                localDateTimeList.add(localDateTime);
-            }
-
-            localDateTimeArray = new LocalDateTime[localDateTimeList.size()];
-            localDateTimeList.toArray(localDateTimeArray);
-
-            return localDateTimeArray;
-
-        } catch (FileNotFoundException e) {
-            throw e;
-        } finally {
-            // Creating an instance of Scanner can fail and remain null
-            if (scanner != null)
-                scanner.close();
-        }
     }
 
     private static LocalDateTime createDateTime(CharSequence dateTimeString) {
