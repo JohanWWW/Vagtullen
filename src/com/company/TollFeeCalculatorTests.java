@@ -8,13 +8,39 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Optional;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TollFeeCalculatorTests {
+
+    @Test
+    @DisplayName("Validate that the last LocalDateTime is printed to the console")
+    void tollFeeCalculatorPrintsLastLocalDateTime() {
+        // Arrange
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        PrintStream printStream = new PrintStream(outputStream);
+        System.setOut(printStream);
+
+        // Act
+        new TollFeeCalculator("testdata/test_dates.txt");
+
+        String[] lines = outputStream.toString()
+                                     .replace("\r\n", "\n") // Windows
+                                     .replace("\r", "\n") // MacOS
+                                     .split("\n");
+        String actualLastDate = lines[lines.length - 2]; // <- This is the date that is right above the result line
+
+        printStream.close();
+
+        // Assert
+        String expectedLastDate = "2020-07-14T03:05";
+
+        assertEquals(expectedLastDate, actualLastDate);
+    }
 
     @Test
     @DisplayName("Validate that getTotalFeeCost prints correct output to the console")
@@ -25,7 +51,7 @@ public class TollFeeCalculatorTests {
         System.setOut(printStream);
 
         // Act
-        new TollFeeCalculator("test_dates.txt"); // Discard result because we are only interested of what is printed to the console
+        new TollFeeCalculator("testdata/test_dates.txt"); // Discard result because we are only interested of what is printed to the console
 
         String actualConsoleOutput = outputStream.toString()
                                                  .replace("\r\n", "\n") // Windows
@@ -58,6 +84,30 @@ public class TollFeeCalculatorTests {
             "The total fee for the inputfile is44\n"; // <- Missing whitespace :(
 
         assertEquals(expectedConsoleOutput, actualConsoleOutput);
+    }
+
+    @Test
+    @DisplayName("Validate that toll fees never exeed 60 SEK per day")
+    void getTotalFeeCostReturnsNoMoreThanMaxPerDay() {
+        // Arrange
+        LocalDateTime[] testDates = {
+            createDateTime("2020-06-09 06:50"),
+            createDateTime("2020-06-09 07:40"),
+            createDateTime("2020-06-09 10:43"),
+            createDateTime("2020-06-09 11:02"),
+            createDateTime("2020-06-09 11:26"),
+            createDateTime("2020-06-09 13:29"),
+            createDateTime("2020-06-09 16:16"),
+            createDateTime("2020-06-09 17:43"),
+            createDateTime("2020-06-09 17:59"),
+            createDateTime("2020-06-09 18:11"),
+        };
+
+        // Act
+        int result = TollFeeCalculator.getTotalFeeCost(testDates);
+
+        // Assert
+        assertEquals(60, result);
     }
 
     @Test
@@ -211,23 +261,64 @@ public class TollFeeCalculatorTests {
     }
 
     @Test
+    @DisplayName("Validate that NoSuchElementException is handled when the file is empty")
     void tollFeeCalculatorCatchesNoSuchElementException() {
+        // Arrange
+        String pathToEmptyFile = "testdata/empty_file.txt";
 
-    }
-
-    @Test
-    void tollFeeCalculatorCatchesDateTimeParseException() {
-
-    }
-
-    @Test
-    void tollFeeCalculatorCatchesNullPointerException() {
-        // Assert & Act & Assert
         try {
+            // Act
+            new TollFeeCalculator(pathToEmptyFile);
+        } catch (NoSuchElementException e) {
+            fail("NoSuchElementException was unhandled", e);
+        }
+
+        // Assert
+    }
+
+    @Test
+    @DisplayName("Validate that DateTimeParseException is handled when parsing a string that is not yyyy-MM-dd HH:mm formatted")
+    void tollFeeCalculatorCatchesDateTimeParseException() {
+        // Arrange
+        String testFilePath = "testdata/incorrect_datetime_format.txt";
+
+        try {
+            // Act
+            new TollFeeCalculator(testFilePath);
+        } catch (DateTimeParseException e) {
+            fail("DateTimeParseException was unhandled", e);
+        }
+
+        // Assert
+    }
+
+    @Test
+    @DisplayName("Validate that NullPointerException is handled when null passed as filename to the constructor")
+    void tollFeeCalculatorCatchesNullPointerException() {
+        try {
+            // Arrange & Act
             new TollFeeCalculator(null);
         } catch (NullPointerException e) {
-            fail();
+            fail("NullPointerException was unhandled", e);
         }
+
+        // Assert
+    }
+
+    @Test
+    @DisplayName("Validate that ArrayOutOfBoundsException is not thrown when the input file contains only one entry")
+    void tollFeeCalculatorDoesNotThrowArrayOutOfBoundsException() {
+        // Arrange
+        String testFilePath = "testdata/single_datetime.txt";
+
+        try {
+            // Act
+            new TollFeeCalculator(testFilePath);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            fail("ArrayIndexOutOfBoundsException was unhandled", e);
+        }
+
+        // Assert
     }
 
     private static LocalDateTime[] deserializeFile(String filePath) throws FileNotFoundException {
