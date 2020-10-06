@@ -190,14 +190,22 @@ public class TollFeeCalculatorTests {
             createDateTime("2020-10-06 15:30"),
             createDateTime("2020-10-06 16:30"),
             createDateTime("2020-10-06 17:00"),
-            createDateTime("2020-10-06 18:00")
+            createDateTime("2020-10-06 18:00"),
+
+            // Third day
+            createDateTime("2020-10-07 07:05"),
+            createDateTime("2020-10-07 14:00"),
+            createDateTime("2020-10-07 15:31"),
+
+            // Fourth day
+            createDateTime("2020-10-08 15:58")
         };
 
         // Act
         int result = TollFeeCalculator.getTotalFeeCost(testDates);
 
         // Assert
-        assertEquals(120, result, "The grand total is not correct"); // 60 + 60 = 120
+        assertEquals(182, result, "The grand total is not correct"); // 60 + 60 + 44 + 18 = 182
     }
 
     @Test
