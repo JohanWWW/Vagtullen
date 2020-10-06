@@ -85,7 +85,7 @@ public class TollFeeCalculatorTests {
     }
 
     @Test
-    @DisplayName("Validate that toll fees never exeed 60 SEK per day")
+    @DisplayName("Validate that toll fees never exceed 60 SEK per day")
     void getTotalFeeCostReturnsNoMoreThanMaxPerDay() {
         // Arrange
         LocalDateTime[] testDates = {
