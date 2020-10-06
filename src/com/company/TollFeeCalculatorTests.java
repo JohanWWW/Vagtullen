@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TollFeeCalculatorTests {
 
     @Test
-    @DisplayName("Validate that the last LocalDateTime is printed to the console")
+    @DisplayName("Validate that the last LocalDateTime that is printed to the console is correct")
     void tollFeeCalculatorPrintsLastLocalDateTime() {
         // Arrange
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -37,7 +37,7 @@ public class TollFeeCalculatorTests {
         // Assert
         String expectedLastDate = "2020-07-14T03:05";
 
-        assertEquals(expectedLastDate, actualLastDate);
+        assertEquals(expectedLastDate, actualLastDate, "The last LocalDateTime that is printed to the console is not correct");
     }
 
     @Test
@@ -81,11 +81,11 @@ public class TollFeeCalculatorTests {
             "2020-07-14T03:05\n" +
             "The total fee for the inputfile is44\n"; // <- Missing whitespace :(
 
-        assertEquals(expectedConsoleOutput, actualConsoleOutput);
+        assertEquals(expectedConsoleOutput, actualConsoleOutput, "The console output is incorrect");
     }
 
     @Test
-    @DisplayName("Validate that toll fees never exeed 60 SEK per day")
+    @DisplayName("Validate that the fee cost never exceed 60 SEK per day")
     void getTotalFeeCostReturnsNoMoreThanMaxPerDay() {
         // Arrange
         LocalDateTime[] testDates = {
@@ -100,16 +100,17 @@ public class TollFeeCalculatorTests {
             createDateTime("2020-06-09 17:59"),
             createDateTime("2020-06-09 18:11"),
         };
+        // Total: 65 SEK before discount
 
         // Act
         int result = TollFeeCalculator.getTotalFeeCost(testDates);
 
         // Assert
-        assertEquals(60, result);
+        assertEquals(60, result, "The fee cost exceeded 60 SEK");
     }
 
     @Test
-    @DisplayName("Validate that toll fees are calculated correctly")
+    @DisplayName("Validate that the total fee cost is calculated correctly")
     void getTotalFeeCost() {
         // Arrange & Act
         int result = TollFeeCalculator.getTotalFeeCost(new LocalDateTime[] {
@@ -126,7 +127,7 @@ public class TollFeeCalculatorTests {
         });
 
         // Assert
-        assertEquals(55, result);
+        assertEquals(55, result, "The total fee cost is incorrect");
     }
 
     @Test
@@ -165,11 +166,11 @@ public class TollFeeCalculatorTests {
             "2020-10-05T17:00\n" +
             "2020-10-05T18:00\n";
 
-        assertEquals(expectedConsoleOutput, actualConsoleOutput);
+        assertEquals(expectedConsoleOutput, actualConsoleOutput, "Values from the input file where not sorted correctly by the program");
     }
 
     @Test
-    @DisplayName("Validate that toll fees are calculated for each day")
+    @DisplayName("Validate that the total fee includes the subtotal for each day")
     void getTotalFeeCostForOverlappingDays() {
         // Arrange
         LocalDateTime[] testDates = {
@@ -189,17 +190,26 @@ public class TollFeeCalculatorTests {
             createDateTime("2020-10-06 15:30"),
             createDateTime("2020-10-06 16:30"),
             createDateTime("2020-10-06 17:00"),
-            createDateTime("2020-10-06 18:00")
+            createDateTime("2020-10-06 18:00"),
+
+            // Third day
+            createDateTime("2020-10-07 07:05"),
+            createDateTime("2020-10-07 14:00"),
+            createDateTime("2020-10-07 15:31"),
+
+            // Fourth day
+            createDateTime("2020-10-08 15:58")
         };
 
         // Act
         int result = TollFeeCalculator.getTotalFeeCost(testDates);
 
         // Assert
-        assertEquals(120, result); // 60 + 60 = 120
+        assertEquals(182, result, "The grand total is not correct"); // 60 + 60 + 44 + 18 = 182
     }
 
     @Test
+    @DisplayName("Validate that toll fee per passing is correct")
     void getTollFeePerPassing() {
         // Arrange & Act
         int result1 = TollFeeCalculator.getTollFeePerPassing(createDateTime("2020-06-30 00:05"));
@@ -214,48 +224,18 @@ public class TollFeeCalculatorTests {
         int result10 = TollFeeCalculator.getTollFeePerPassing(createDateTime("2020-07-01 00:00"));
 
         // Assert
-        assertEquals(0, result1);
-        assertEquals(13, result2);
-        assertEquals(8, result3);
-        assertEquals(8, result4);
-        assertEquals(8, result5);
-        assertEquals(8, result6);
-        assertEquals(18, result7);
-        assertEquals(8, result8);
-        assertEquals(0, result9);
-        assertEquals(0, result10);
-    }
+        String assertFailedMessage = "The toll fee per passing is incorrect";
 
-    @Test
-    @DisplayName("Validate isTollFreeDate returns correct values")
-    void isTollFreeDate() {
-        /*
-            Toll free dates are:
-                * Saturday
-                * Sunday
-                * Any day in the month of July
-         */
-
-        // Arrange
-        LocalDateTime tuesdayInJune = createDate("2020-06-16");
-        LocalDateTime saturdayInJune = createDate("2020-06-27");
-        LocalDateTime sundayInJuly = createDate("2020-07-19");
-        LocalDateTime thursdayInJuly = createDate("2020-07-30");
-        LocalDateTime fridayInAugust = createDate("2020-08-07");
-
-        // Act
-        boolean result1 = TollFeeCalculator.isTollFreeDate(tuesdayInJune);
-        boolean result2 = TollFeeCalculator.isTollFreeDate(saturdayInJune);
-        boolean result3 = TollFeeCalculator.isTollFreeDate(sundayInJuly);
-        boolean result4 = TollFeeCalculator.isTollFreeDate(thursdayInJuly);
-        boolean result5 = TollFeeCalculator.isTollFreeDate(fridayInAugust);
-
-        // Assert
-        assertFalse(result1);
-        assertTrue(result2);
-        assertTrue(result3);
-        assertTrue(result4);
-        assertFalse(result5);
+        assertEquals(0, result1, assertFailedMessage);
+        assertEquals(13, result2, assertFailedMessage);
+        assertEquals(8, result3, assertFailedMessage);
+        assertEquals(8, result4, assertFailedMessage);
+        assertEquals(8, result5, assertFailedMessage);
+        assertEquals(8, result6, assertFailedMessage);
+        assertEquals(18, result7, assertFailedMessage);
+        assertEquals(8, result8, assertFailedMessage);
+        assertEquals(0, result9, assertFailedMessage);
+        assertEquals(0, result10, assertFailedMessage);
     }
 
     @Test
