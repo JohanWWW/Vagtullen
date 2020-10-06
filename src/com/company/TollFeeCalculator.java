@@ -37,24 +37,19 @@ public class TollFeeCalculator {
     }
 
     public static int getTotalFeeCost(LocalDateTime[] dates) {
-        Arrays.sort(dates, Comparator.naturalOrder());
-        int totalFee = 0;
-        LocalDateTime intervalStartDateTime = dates[0];
-        for(LocalDateTime date: dates) {
-            System.out.println(date.toString());
-            long diffInMinutes = intervalStartDateTime.until(date, ChronoUnit.MINUTES);
-            if(diffInMinutes > 60) {
-                totalFee += getTollFeePerPassing(date);
-                intervalStartDateTime = date;
-            } else {
-                int currentFee = getTollFeePerPassing(date);
-                int previousFee = getTollFeePerPassing(intervalStartDateTime);
-                if (currentFee > previousFee) {
-                    totalFee += currentFee;
-                }
-            }
+        int grandTotalFee = 0;
+
+        // This groups LocalDateTime instances that have the same LocalDate component, into arrays resulting in a collection of arrays
+        Map<LocalDate, List<LocalDateTime>> datesByDateTime = Arrays.stream(dates).collect(Collectors.groupingBy(LocalDateTime::toLocalDate, Collectors.toList()));
+        LocalDate[] localDates = datesByDateTime.keySet().stream().sorted(Comparator.naturalOrder()).toArray(LocalDate[]::new); // Map keys to array
+
+        // Iterate through each day
+        for (LocalDate currentDate: localDates) {
+            var currentDayCollection = datesByDateTime.get(currentDate).stream().sorted(Comparator.naturalOrder()).toArray(LocalDateTime[]::new);
+            grandTotalFee += calculateFeeCost(currentDayCollection);
         }
-        return Math.min(totalFee, 60);
+
+        return grandTotalFee;
     }
 
     public static int getTollFeePerPassing(LocalDateTime date) {
@@ -79,5 +74,25 @@ public class TollFeeCalculator {
 
     public static void main(String[] args) {
         new TollFeeCalculator("Lab4.txt");
+    }
+
+    private static int calculateFeeCost(LocalDateTime[] batchedDay) {
+        int totalFee = 0;
+        LocalDateTime intervalStartDateTime = batchedDay[0];
+        for(LocalDateTime date: batchedDay) {
+            System.out.println(date.toString());
+            long diffInMinutes = intervalStartDateTime.until(date, ChronoUnit.MINUTES);
+            if (diffInMinutes > 60 || date.equals(intervalStartDateTime)) {
+                totalFee += getTollFeePerPassing(date);
+                intervalStartDateTime = date;
+            } else {
+                int currentFee = getTollFeePerPassing(date);
+                int previousFee = getTollFeePerPassing(intervalStartDateTime);
+                if (currentFee > previousFee) {
+                    totalFee += currentFee;
+                }
+            }
+        }
+        return Math.min(totalFee, 60);
     }
 }
