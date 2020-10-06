@@ -36,7 +36,8 @@ public class TollFeeCalculator {
                 totalFee += Math.max(getTollFeePerPassing(date), getTollFeePerPassing(intervalStart));
             }
         }
-        return Math.max(totalFee, 60);
+        //return Math.min(totalFee, 60);
+        return Math.min(totalFee, 60);
     }
 
     public static int getTollFeePerPassing(LocalDateTime date) {
