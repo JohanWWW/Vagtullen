@@ -36,6 +36,10 @@ public class TollFeeCalculator {
         }
     }
 
+    public static void main(String[] args) {
+        new TollFeeCalculator("Lab4.txt");
+    }
+
     public static int getTotalFeeCost(LocalDateTime[] dates) {
         int grandTotalFee = 0;
 
@@ -70,10 +74,6 @@ public class TollFeeCalculator {
 
     public static boolean isTollFreeDate(LocalDateTime date) {
         return date.getDayOfWeek().getValue() == 6 || date.getDayOfWeek().getValue() == 7 || date.getMonth().getValue() == 7;
-    }
-
-    public static void main(String[] args) {
-        new TollFeeCalculator("Lab4.txt");
     }
 
     private static int calculateFeeCost(LocalDateTime[] batchedDay) {
